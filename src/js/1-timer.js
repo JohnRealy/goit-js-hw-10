@@ -14,8 +14,8 @@ import 'izitoast/dist/css/iziToast.min.css';
 
 let userSelectedDate;
 
-const btn = document.querySelector('button');
-btn.disabled = true;
+const startButton = document.querySelector('button');
+startButton.disabled = true;
 const day = document.querySelector('.value[data-days]');
 const hour = document.querySelector('.value[data-hours]');
 const min = document.querySelector('.value[data-minutes]');
@@ -33,31 +33,30 @@ const options = {
         message: 'Please choose a date in the future',
         position: 'topRight',
       });
-      btn.disabled = true;
+      startButton.disabled = true;
       return;
     }
-    btn.disabled = false;
+    startButton.disabled = false;
     userSelectedDate = selectedDates[0];
   },
 };
 
 flatpickr('#datetime-picker', options);
 
-btn.addEventListener('click', () => {
+startButton.addEventListener('click', () => {
   let timerValue = convertMs(userSelectedDate - Date.now());
-  btn.disabled = true;
-  day.textContent = addLeadingZero(timerValue.days);
-  hour.textContent = addLeadingZero(timerValue.hours);
-  min.textContent = addLeadingZero(timerValue.minutes);
-  sec.textContent = addLeadingZero(timerValue.seconds);
+  startButton.disabled = true;
+  changeTimeMarkup(timerValue);
   const intervalId = setInterval(() => {
     timerValue = convertMs(userSelectedDate - Date.now());
 
-    day.textContent = addLeadingZero(timerValue.days);
-    hour.textContent = addLeadingZero(timerValue.hours);
-    min.textContent = addLeadingZero(timerValue.minutes);
-    sec.textContent = addLeadingZero(timerValue.seconds);
-    if (timerValue.seconds === 0) {
+    changeTimeMarkup(timerValue);
+    if (
+      timerValue.seconds === 0 &&
+      timerValue.minutes === 0 &&
+      timerValue.hours === 0 &&
+      timerValue.days === 0
+    ) {
       console.log('Звуки айфонівського будильника');
       clearInterval(intervalId);
     }
@@ -81,6 +80,13 @@ function convertMs(ms) {
   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
   return { days, hours, minutes, seconds };
+}
+
+function changeTimeMarkup(timerValue) {
+  day.textContent = addLeadingZero(timerValue.days);
+  hour.textContent = addLeadingZero(timerValue.hours);
+  min.textContent = addLeadingZero(timerValue.minutes);
+  sec.textContent = addLeadingZero(timerValue.seconds);
 }
 
 function addLeadingZero(value) {
